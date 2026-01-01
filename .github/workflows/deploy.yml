@@ -1,0 +1,13 @@
+name: Deploy to dhanjit.me
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deployment
+        run: curl -X POST "[REDACTED_VERCEL_HOOK]"
