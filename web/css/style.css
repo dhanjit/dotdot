@@ -1,0 +1,155 @@
+:root {
+    --bg-color: #f0f0f0;
+    --paper-color: #fffdf0;
+    --line-color: #a4c2f4; /* Light blue notebook lines */
+    --ink-color: #2b2b2b;
+    --p1-color: #e74c3c;
+    --p2-color: #3498db;
+    --hover-color: rgba(0, 0, 0, 0.1);
+    --dot-color: #333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.game-container {
+    background-color: var(--paper-color);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 1.5rem;
+}
+
+h1 {
+    color: var(--ink-color);
+    margin: 0 0 1rem 0;
+    font-size: 2.5rem;
+}
+
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.player-score {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+#p1-score { color: var(--p1-color); }
+#p2-score { color: var(--p2-color); }
+
+.turn-indicator {
+    background-color: #eee;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.p1-turn { color: var(--p1-color); border: 2px solid var(--p1-color); }
+.p2-turn { color: var(--p2-color); border: 2px solid var(--p2-color); }
+
+.message {
+    height: 1.5rem;
+    color: #e67e22;
+    font-weight: bold;
+}
+
+#game-board {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    /* Notebook ruled lines effect could go here */
+}
+
+svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    user-select: none;
+}
+
+.dot {
+    fill: var(--dot-color);
+}
+
+.interaction-line {
+    stroke: transparent;
+    stroke-width: 15;
+    cursor: pointer;
+    transition: stroke 0.2s;
+}
+
+.interaction-line:hover {
+    stroke: var(--hover-color);
+}
+
+.drawn-line {
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.line-p1 { stroke: var(--p1-color); }
+.line-p2 { stroke: var(--p2-color); }
+
+.box-fill {
+    fill-opacity: 0.3;
+    transition: fill-opacity 0.5s;
+}
+
+.box-p1 { fill: var(--p1-color); }
+.box-p2 { fill: var(--p2-color); }
+
+.box-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 1.5rem;
+    fill: var(--ink-color);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+}
+
+footer {
+    margin-top: 2rem;
+    color: #888;
+}
+
+button {
+    background-color: var(--ink-color);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 1rem;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+select {
+    padding: 0.5rem;
+    font-size: 1rem;
+}
