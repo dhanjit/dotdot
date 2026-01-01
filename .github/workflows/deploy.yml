@@ -1,0 +1,13 @@
+name: Deploy to dhanjit.me
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deployment
+        run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_620Ufctmg7UeCvx73e0sNh12wFY2/cjyn9B1xrM"
