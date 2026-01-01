@@ -270,6 +270,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (moveCount >= maxChainMoves) {
                 console.warn('[AI] Hit maximum chain moves limit!');
+
+                // Force turn to end if AI still has it
+                if (game.getCurrentPlayer() === 'P2' && !game.gameOver) {
+                    console.warn('[AI] Forcing turn to switch to prevent stuck game');
+                    game.currentPlayerIndex = 0; // Switch to P1
+                }
             }
 
             console.log('[AI] ========== AI sequence complete ==========');
