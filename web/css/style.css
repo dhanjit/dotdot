@@ -122,6 +122,24 @@ svg {
     /* Slight fade as requested */
 }
 
+.last-move {
+    stroke-width: 6;
+    opacity: 1;
+    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.8));
+    animation: pulse-highlight 0.8s ease-out;
+}
+
+@keyframes pulse-highlight {
+    0% {
+        stroke-width: 8;
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1));
+    }
+    100% {
+        stroke-width: 6;
+        filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.8));
+    }
+}
+
 /* Pencil aesthetics */
 .line-p1 {
     stroke: #666666;
