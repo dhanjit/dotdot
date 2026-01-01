@@ -122,17 +122,17 @@ svg {
     /* Slight fade as requested */
 }
 
-/* Subtle ink colors */
+/* Pencil aesthetics */
 .line-p1 {
-    stroke: #543b3b;
+    stroke: #666666;
 }
 
-/* Dark Reddish Ink */
+/* Standard Pencil (HB) - Graphite Gray */
 .line-p2 {
-    stroke: #3b4554;
+    stroke: #2a2a2a;
 }
 
-/* Dark Bluish Ink */
+/* Dark Pencil (4B) - Deep Charcoal */
 
 .box-fill {
     fill-opacity: 0.3;
