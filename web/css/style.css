@@ -123,21 +123,9 @@ svg {
 }
 
 .last-move {
-    stroke-width: 6;
+    stroke: #c85050 !important;
+    stroke-width: 5;
     opacity: 1;
-    filter: drop-shadow(0 0 3px rgba(220, 80, 80, 0.7));
-    animation: pulse-highlight 0.8s ease-out;
-}
-
-@keyframes pulse-highlight {
-    0% {
-        stroke-width: 8;
-        filter: drop-shadow(0 0 8px rgba(220, 80, 80, 0.9));
-    }
-    100% {
-        stroke-width: 6;
-        filter: drop-shadow(0 0 3px rgba(220, 80, 80, 0.7));
-    }
 }
 
 /* Pencil aesthetics */
