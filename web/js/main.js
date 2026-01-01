@@ -165,19 +165,44 @@ document.addEventListener('DOMContentLoaded', () => {
             // Disable interaction
             ui.container.style.pointerEvents = 'none';
 
-            // Simulate thinking delay
-            await new Promise(resolve => setTimeout(resolve, 800));
+            // Keep making moves while AI has the turn (for chain captures)
+            let moveCount = 0;
+            const maxChainMoves = 20; // Safety limit to prevent infinite loops
 
-            // Make move
-            try {
-                const move = ai.getMove(game);
-                if (move) {
-                    ui.handleLineClick(move.type, move.r, move.c);
-                } else {
-                    console.error("AI returned no move! Game might be stuck.");
+            while (game.getCurrentPlayer() === 'P2' && !game.gameOver && moveCount < maxChainMoves) {
+                // Simulate thinking delay (shorter for chain moves)
+                const delay = moveCount === 0 ? 800 : 400;
+                await new Promise(resolve => setTimeout(resolve, delay));
+
+                // Make move
+                try {
+                    const move = ai.getMove(game);
+                    if (move) {
+                        const result = game.placeLine(move.type, move.r, move.c);
+
+                        if (result.success) {
+                            // Manually update UI (bypass the automatic checkAiTurn call)
+                            ui.renderMove(move.type, move.r, move.c, result);
+                            ui.updateStatus();
+
+                            moveCount++;
+
+                            // If no extra turn, break the loop
+                            if (!result.extraTurn) {
+                                break;
+                            }
+                        } else {
+                            console.error("AI move failed:", move);
+                            break;
+                        }
+                    } else {
+                        console.error("AI returned no move! Game might be stuck.");
+                        break;
+                    }
+                } catch (e) {
+                    console.error("AI Error:", e);
+                    break;
                 }
-            } catch (e) {
-                console.error("AI Error:", e);
             }
 
             // Cleanup

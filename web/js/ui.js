@@ -156,44 +156,52 @@ class UI {
         const result = this.game.placeLine(type, r, c);
 
         if (result.success) {
-            // Update the clicked line style
-            const lineId = `${type}-${r}-${c}`;
-            const lineEl = document.getElementById(lineId);
-            if (lineEl) {
-                lineEl.classList.remove('interaction-line');
-                lineEl.classList.add('drawn-line');
-
-                // Add player-specific class for line color
-                lineEl.classList.add(player === 'P1' ? 'line-p1' : 'line-p2');
-
-                // Remove manual stroke setting if it was there
-                lineEl.style.stroke = "";
-            }
-
-            // Update any new squares
-            if (result.newSquares && result.newSquares.length > 0) {
-                result.newSquares.forEach(sq => {
-                    const sqEl = document.getElementById(`sq-${sq.r}-${sq.c}`);
-                    const textEl = document.getElementById(`text-${sq.r}-${sq.c}`);
-
-                    // The owner of the square is the CURRENT player because they just made the move and kept the turn.
-                    const owner = this.game.squares[sq.r][sq.c];
-
-                    if (sqEl) {
-                        sqEl.classList.add(owner === 'P1' ? 'box-p1' : 'box-p2');
-                        sqEl.style.fillOpacity = "0.3";
-                    }
-                    if (textEl) {
-                        textEl.textContent = this.playerNames[owner]; // Custom name
-                    }
-                });
-                this.messageEl.textContent = "Square Captured! Extra Turn!";
-                setTimeout(() => this.messageEl.textContent = "", 2000);
-            }
-
+            this.renderMove(type, r, c, result, player);
             this.updateStatus();
         } else {
             console.log("Invalid move or line already placed");
+        }
+    }
+
+    renderMove(type, r, c, result, player = null) {
+        // Use provided player or infer from game state
+        if (!player) {
+            player = this.game.squares[result.newSquares?.[0]?.r]?.[result.newSquares?.[0]?.c] || this.game.getCurrentPlayer();
+        }
+
+        // Update the clicked line style
+        const lineId = `${type}-${r}-${c}`;
+        const lineEl = document.getElementById(lineId);
+        if (lineEl) {
+            lineEl.classList.remove('interaction-line');
+            lineEl.classList.add('drawn-line');
+
+            // Add player-specific class for line color
+            lineEl.classList.add(player === 'P1' ? 'line-p1' : 'line-p2');
+
+            // Remove manual stroke setting if it was there
+            lineEl.style.stroke = "";
+        }
+
+        // Update any new squares
+        if (result.newSquares && result.newSquares.length > 0) {
+            result.newSquares.forEach(sq => {
+                const sqEl = document.getElementById(`sq-${sq.r}-${sq.c}`);
+                const textEl = document.getElementById(`text-${sq.r}-${sq.c}`);
+
+                // The owner of the square is the CURRENT player because they just made the move and kept the turn.
+                const owner = this.game.squares[sq.r][sq.c];
+
+                if (sqEl) {
+                    sqEl.classList.add(owner === 'P1' ? 'box-p1' : 'box-p2');
+                    sqEl.style.fillOpacity = "0.3";
+                }
+                if (textEl) {
+                    textEl.textContent = this.playerNames[owner]; // Custom name
+                }
+            });
+            this.messageEl.textContent = "Square Captured! Extra Turn!";
+            setTimeout(() => this.messageEl.textContent = "", 2000);
         }
     }
 
