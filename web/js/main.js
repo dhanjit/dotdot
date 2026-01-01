@@ -61,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rowsInput) rowsInput.value = rows;
     if (colsInput) colsInput.value = cols;
 
-    let game = new GameState(rows, cols);
-    let ui = new UI(game); // Defaults to P1/P2
+    let game;
+    let ui;
 
     // Handlers for controls
     gameModeSelect.addEventListener('change', (e) => {
@@ -211,6 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
             isAiThinking = false;
         }
     }
+
+    // Initialize game with correct mode
+    difficultyGroup.style.display = gameMode === 'pvc' ? 'flex' : 'none';
+    startNewGame(rows, cols);
 
     console.log("DotDot initialized!");
 });
