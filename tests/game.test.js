@@ -1,15 +1,15 @@
-
 const GameState = require('../web/js/game.js');
 
 describe('Dots and Boxes Game Logic', () => {
     let game;
 
     beforeEach(() => {
-        game = new GameState(3); // 3x3 dots = 2x2 squares
+        game = new GameState(3, 3); // 3x3 dots
     });
 
     test('initializes correctly', () => {
-        expect(game.gridSize).toBe(3);
+        expect(game.rows).toBe(3);
+        expect(game.cols).toBe(3);
         expect(game.horizontalLines.length).toBe(3);
         expect(game.horizontalLines[0].length).toBe(2);
         expect(game.verticalLines.length).toBe(2);
@@ -56,24 +56,18 @@ describe('Dots and Boxes Game Logic', () => {
     });
 
     test('detects game over', () => {
-        // 2x2 squares = 4 squares total
-        // We will just simulate filling squares
-        game.squares[0][0] = 'P1';
-        game.squares[0][1] = 'P1';
-        game.squares[1][0] = 'P2';
-        game.occupiedSquares = 3;
+        // Use a small 2x2 grid (1 square) for easier game over test
+        game = new GameState(2, 2);
+        // 1 square total
 
-        // Last move fills the last square
-        // We need to setup lines for 1,1
-        // H(1,1), H(2,1), V(1,1), V(1,2)
-        game.horizontalLines[1][1] = true;
-        game.horizontalLines[2][1] = true;
-        game.verticalLines[1][1] = true;
-        // Place last line
-        game.placeLine('v', 1, 2);
+        // H(0,0), H(1,0), V(0,0), V(0,1)
+        game.placeLine('h', 0, 0); // P1
+        game.placeLine('h', 1, 0); // P2
+        game.placeLine('v', 0, 0); // P1
+        game.placeLine('v', 0, 1); // P2 (completes)
 
         expect(game.gameOver).toBe(true);
-        expect(game.winner).toBe('P1'); // 3 vs 1
+        expect(game.winner).toBe('P2');
     });
 
     test('prevents invalid moves', () => {
@@ -84,5 +78,31 @@ describe('Dots and Boxes Game Logic', () => {
 
         const outOfBounds = game.placeLine('h', 9, 9);
         expect(outOfBounds.success).toBe(false);
+    });
+
+    test('rectangular grid support (3x2)', () => {
+        // 3 rows, 2 cols (2x1 squares)
+        const game = new GameState(3, 2);
+
+        expect(game.rows).toBe(3);
+        expect(game.cols).toBe(2);
+
+        // Check grid dimensions
+        // Horizontal: 3 rows, 1 col (2-1)
+        expect(game.horizontalLines.length).toBe(3);
+        expect(game.horizontalLines[0].length).toBe(1);
+
+        // Vertical: 2 rows (3-1), 2 cols
+        expect(game.verticalLines.length).toBe(2);
+        expect(game.verticalLines[0].length).toBe(2);
+
+        // Place valid line
+        const res = game.placeLine('h', 2, 0); // Last row horizontal
+        expect(res.success).toBe(true);
+
+        // Place invalid line (col 1 is out of bounds for horizontal lines in 2-col visual grid)
+        // Horizontal lines have cols-1 columns. 2-1 = 1 column (index 0). Index 1 is invalid.
+        const invalid = game.placeLine('h', 0, 1);
+        expect(invalid.success).toBe(false);
     });
 });
