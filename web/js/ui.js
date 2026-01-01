@@ -3,8 +3,9 @@
  * UI Controller for Dots and Boxes
  */
 class UI {
-    constructor(game) {
+    constructor(game, playerNames = { P1: 'P1', P2: 'P2' }) {
         this.game = game;
+        this.playerNames = playerNames;
         this.dotSpacing = 60;
         this.margin = 30;
         this.container = document.getElementById('game-board');
@@ -183,7 +184,7 @@ class UI {
                         sqEl.style.fillOpacity = "0.3";
                     }
                     if (textEl) {
-                        textEl.textContent = owner; // "P1" or "P2"
+                        textEl.textContent = this.playerNames[owner]; // Custom name
                     }
                 });
                 this.messageEl.textContent = "Square Captured! Extra Turn!";
@@ -197,17 +198,22 @@ class UI {
     }
 
     updateStatus() {
-        this.p1ScoreEl.textContent = `P1: ${this.game.scores['P1']}`;
-        this.p2ScoreEl.textContent = `P2: ${this.game.scores['P2']}`;
+        this.p1ScoreEl.textContent = `${this.playerNames['P1']}: ${this.game.scores['P1']}`;
+        this.p2ScoreEl.textContent = `${this.playerNames['P2']}: ${this.game.scores['P2']}`;
 
         const currentPlayer = this.game.getCurrentPlayer();
 
         if (this.game.gameOver) {
-            this.turnIndicator.textContent = `Winner: ${this.game.winner === 'Draw' ? 'Draw!' : this.game.winner + ' Wins!'}`;
+            let winnerText = 'Draw!';
+            if (this.game.winner !== 'Draw') {
+                winnerText = `${this.playerNames[this.game.winner]} Wins!`;
+            }
+            this.turnIndicator.textContent = `Winner: ${winnerText}`;
             this.turnIndicator.className = 'turn-indicator'; // Reset colors or add gold
             this.messageEl.textContent = "Game Over!";
         } else {
-            this.turnIndicator.textContent = `${currentPlayer === 'P1' ? 'Player 1' : 'Player 2'}'s Turn`;
+            const name = this.playerNames[currentPlayer];
+            this.turnIndicator.textContent = `${name}'s Turn`;
             this.turnIndicator.className = `turn-indicator ${currentPlayer === 'P1' ? 'p1-turn' : 'p2-turn'}`;
         }
     }

@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (colsInput) colsInput.value = cols;
 
     let game = new GameState(rows, cols);
-    let ui = new UI(game);
+    let ui = new UI(game); // Defaults to P1/P2
 
     // Handlers for controls
     gameModeSelect.addEventListener('change', (e) => {
@@ -135,7 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startNewGame(r, c) {
         game = new GameState(r, c);
-        ui = new UI(game);
+
+        const playerNames = (gameMode === 'pvc')
+            ? { P1: 'YOU', P2: 'AI' }
+            : { P1: 'P1', P2: 'P2' };
+
+        ui = new UI(game, playerNames);
 
         // Setup AI Hooks
         // Override UI's updateStatus to detect turn change?
