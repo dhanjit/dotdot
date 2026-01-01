@@ -10,6 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // AI Configuration
+    let gameMode = 'pvp'; // 'pvp', 'pvc'
+    let aiDifficulty = 'greedy';
+    let ai = new DotDotAI(aiDifficulty);
+    let isAiThinking = false;
+
+    // Elements
+    const gameModeSelect = document.getElementById('game-mode');
+    const difficultyGroup = document.getElementById('difficulty-group');
+    const difficultySelect = document.getElementById('ai-difficulty');
+    const aiStatus = document.getElementById('ai-status');
+
     // Default configuration (will be overridden by responsive check)
     let rows = 10;
     let cols = 10;
@@ -52,6 +64,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let game = new GameState(rows, cols);
     let ui = new UI(game);
 
+    // Handlers for controls
+    gameModeSelect.addEventListener('change', (e) => {
+        gameMode = e.target.value;
+        difficultyGroup.style.display = gameMode === 'pvc' ? 'flex' : 'none';
+        restartGame();
+    });
+
+    difficultySelect.addEventListener('change', (e) => {
+        aiDifficulty = e.target.value;
+        ai = new DotDotAI(aiDifficulty);
+        // No need to restart, just updates strategy
+    });
+
     const restartBtn = document.getElementById('restart-btn');
 
     restartBtn.addEventListener('click', restartGame);
@@ -90,10 +115,71 @@ document.addEventListener('DOMContentLoaded', () => {
         startNewGame(r, c);
     }
 
+    // We need to intercept the UI turn switch to trigger AI
+    // We can't modify UI.handleLineClick easily without access to UI class definition?
+    // Actually UI.handleLineClick calls game.placeLine.
+    // Ideally UI should emit an event or we should subclass UI? 
+    // Or simpler: We modify UI class in ui.js to accept an "onTurnEnd" callback?
+    // OR we just poll? Polling is bad.
+
+    // Better approach: 
+    // Modify UI class in `web/js/ui.js` to dispatch an event or call a callback.
+    // BUT we are in main.js. 
+
+    // Let's modify handleLineClick mechanism.
+    // We can attach a listener to the game object? GameState doesn't emit events.
+
+    // Let's patch UI.handleLineClick or pass a callback to UI constructor.
+    // Since we can't change UI constructor signature easily without breaking existing tests?, 
+    // let's just add a method to UI instance.
+
     function startNewGame(r, c) {
         game = new GameState(r, c);
         ui = new UI(game);
-        console.log(`New game started with grid size ${r}x${c}`);
+
+        // Setup AI Hooks
+        // Override UI's updateStatus to detect turn change?
+        const originalUpdateStatus = ui.updateStatus.bind(ui);
+        ui.updateStatus = () => {
+            originalUpdateStatus();
+            checkAiTurn();
+        };
+
+        console.log(`New game started: ${r}x${c}, Mode: ${gameMode}`);
+        checkAiTurn(); // In case AI goes first (currently P1 starts, but good practice)
+    }
+
+    async function checkAiTurn() {
+        if (gameMode !== 'pvc' || game.gameOver) return;
+
+        // P2 is AI
+        if (game.getCurrentPlayer() === 'P2' && !isAiThinking) {
+            isAiThinking = true;
+            aiStatus.classList.remove('hidden');
+
+            // Disable interaction
+            ui.container.style.pointerEvents = 'none';
+
+            // Simulate thinking delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Make move
+            try {
+                const move = ai.getMove(game);
+                if (move) {
+                    ui.handleLineClick(move.type, move.r, move.c);
+                } else {
+                    console.error("AI returned no move! Game might be stuck.");
+                }
+            } catch (e) {
+                console.error("AI Error:", e);
+            }
+
+            // Cleanup
+            ui.container.style.pointerEvents = 'auto';
+            aiStatus.classList.add('hidden');
+            isAiThinking = false;
+        }
     }
 
     console.log("DotDot initialized!");

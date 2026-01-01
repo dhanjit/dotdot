@@ -178,11 +178,49 @@ button:hover {
 }
 
 /* Controls grouping */
+.game-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 1rem;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.option-group label {
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.option-group select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
 .controls {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
+}
+
+#ai-status {
+    margin-top: 10px;
+    font-style: italic;
+    color: var(--p2-color);
+    font-weight: bold;
+    height: 1.2em;
+    /* Reserve space */
+}
+
+#ai-status.hidden {
+    visibility: hidden;
 }
 
 .input-group {
