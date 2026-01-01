@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         game = new GameState(r, c);
 
         const playerNames = (gameMode === 'pvc')
-            ? { P1: 'YOU', P2: 'AI' }
+            ? { P1: 'YOU', P2: 'DD' }
             : { P1: 'P1', P2: 'P2' };
 
         ui = new UI(game, playerNames);
