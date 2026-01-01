@@ -13,6 +13,7 @@ class UI {
         this.turnIndicator = document.getElementById('turn-indicator');
         this.p1ScoreEl = document.getElementById('p1-score');
         this.p2ScoreEl = document.getElementById('p2-score');
+        this.lastLineElement = null; // Track last drawn line for highlighting
 
         this.initBoard();
         this.updateStatus();
@@ -169,6 +170,11 @@ class UI {
             player = this.game.squares[result.newSquares?.[0]?.r]?.[result.newSquares?.[0]?.c] || this.game.getCurrentPlayer();
         }
 
+        // Remove highlight from previous move
+        if (this.lastLineElement) {
+            this.lastLineElement.classList.remove('last-move');
+        }
+
         // Update the clicked line style
         const lineId = `${type}-${r}-${c}`;
         const lineEl = document.getElementById(lineId);
@@ -178,6 +184,10 @@ class UI {
 
             // Add player-specific class for line color
             lineEl.classList.add(player === 'P1' ? 'line-p1' : 'line-p2');
+
+            // Highlight as last move
+            lineEl.classList.add('last-move');
+            this.lastLineElement = lineEl;
 
             // Remove manual stroke setting if it was there
             lineEl.style.stroke = "";
