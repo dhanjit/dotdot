@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // AI Configuration
-    let gameMode = 'pvp'; // 'pvp', 'pvc'
+    let gameMode = 'pvc'; // 'pvp', 'pvc'
     let aiDifficulty = 'greedy';
     let ai = new DotDotAI(aiDifficulty);
     let isAiThinking = false;
