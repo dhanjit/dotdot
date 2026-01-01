@@ -212,6 +212,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Rules Modal Handlers
+    const rulesBtn = document.getElementById('rules-btn');
+    const rulesModal = document.getElementById('rules-modal');
+    const closeBtn = document.querySelector('.close-btn');
+
+    rulesBtn.addEventListener('click', () => {
+        rulesModal.classList.remove('hidden');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        rulesModal.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    rulesModal.addEventListener('click', (e) => {
+        if (e.target === rulesModal) {
+            rulesModal.classList.add('hidden');
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !rulesModal.classList.contains('hidden')) {
+            rulesModal.classList.add('hidden');
+        }
+    });
+
     // Initialize game with correct mode
     difficultyGroup.style.display = gameMode === 'pvc' ? 'flex' : 'none';
     startNewGame(rows, cols);
