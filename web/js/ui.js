@@ -19,7 +19,8 @@ class UI {
 
     initBoard() {
         this.container.innerHTML = '';
-        const size = this.game.gridSize;
+        const rows = this.game.rows;
+        const cols = this.game.cols;
 
         // Calculate dynamic dot spacing
         // Available width in the container (max 500px usually by CSS, but let's be flexible)
@@ -29,17 +30,16 @@ class UI {
         const availableWidth = containerWidth - (2 * margin);
 
         // size-1 squares, but size dots.
-        // We need (size-1) * spacing = availableWidth
-        // So spacing = availableWidth / (size - 1)
+        // We need (cols-1) * spacing = availableWidth
+        // So spacing = availableWidth / (cols - 1)
         // But let's cap the maximum spacing so small grids don't look huge.
         const maxSpacing = 60;
-        let spacing = availableWidth / (size - 1);
+        let spacing = availableWidth / (cols - 1);
         if (spacing > maxSpacing) spacing = maxSpacing;
 
-        // Re-calculate effective width based on clamped spacing
-        const width = (size - 1) * spacing + 2 * margin;
-        // Height is same aspect ratio mostly, but let's stick to square for now logic-wise
-        const height = (size - 1) * spacing + 2 * margin;
+        // Re-calculate effective width and height
+        const width = (cols - 1) * spacing + 2 * margin;
+        const height = (rows - 1) * spacing + 2 * margin;
 
         this.dotSpacing = spacing;
         this.margin = margin;
@@ -50,7 +50,9 @@ class UI {
         svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
         // We can let CSS check width, but setting it here ensures SVG scaling matches coordinate system
         svg.setAttribute("width", "100%");
-        svg.setAttribute("height", "100%");
+        // Height might vary, let's allow it to grow but setting 100% usually works if container adapts
+        // or we can set it explicitly in px if we want exact fit? 
+        // Let's stick to 100% width and auto height via viewBox aspect ratio
 
         this.svg = svg;
 
@@ -70,14 +72,14 @@ class UI {
         this.dotsGroup = document.createElementNS(ns, "g");
         svg.appendChild(this.dotsGroup);
 
-        this.renderGrid(size, ns);
+        this.renderGrid(rows, cols, ns);
         this.container.appendChild(svg);
     }
 
-    renderGrid(size, ns) {
+    renderGrid(rows, cols, ns) {
         // Draw Squares (initially invisible)
-        for (let r = 0; r < size - 1; r++) {
-            for (let c = 0; c < size - 1; c++) {
+        for (let r = 0; r < rows - 1; r++) {
+            for (let c = 0; c < cols - 1; c++) {
                 const rect = document.createElementNS(ns, "rect");
                 rect.setAttribute("x", this.margin + c * this.dotSpacing);
                 rect.setAttribute("y", this.margin + r * this.dotSpacing);
@@ -100,8 +102,8 @@ class UI {
         }
 
         // Draw Horizontal Lines (interaction areas)
-        for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size - 1; c++) {
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols - 1; c++) {
                 const line = document.createElementNS(ns, "line");
                 line.setAttribute("x1", this.margin + c * this.dotSpacing);
                 line.setAttribute("y1", this.margin + r * this.dotSpacing);
@@ -116,8 +118,8 @@ class UI {
         }
 
         // Draw Vertical Lines (interaction areas)
-        for (let r = 0; r < size - 1; r++) {
-            for (let c = 0; c < size; c++) {
+        for (let r = 0; r < rows - 1; r++) {
+            for (let c = 0; c < cols; c++) {
                 const line = document.createElementNS(ns, "line");
                 line.setAttribute("x1", this.margin + c * this.dotSpacing);
                 line.setAttribute("y1", this.margin + r * this.dotSpacing);
@@ -132,8 +134,8 @@ class UI {
         }
 
         // Draw Dots
-        for (let r = 0; r < size; r++) {
-            for (let c = 0; c < size; c++) {
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
                 const circle = document.createElementNS(ns, "circle");
                 circle.setAttribute("cx", this.margin + c * this.dotSpacing);
                 circle.setAttribute("cy", this.margin + r * this.dotSpacing);

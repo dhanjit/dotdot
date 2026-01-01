@@ -177,7 +177,34 @@ button:hover {
     background-color: #555;
 }
 
-select {
-    padding: 0.5rem;
+/* Controls grouping */
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.input-group label {
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 50px;
+    padding: 5px;
     font-size: 1rem;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.x-separator {
+    font-weight: bold;
+    color: #888;
 }

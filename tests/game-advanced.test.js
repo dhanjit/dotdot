@@ -5,7 +5,7 @@ describe('DotDot (Dots and Boxes) Advanced Scenarios', () => {
 
     test('Simulate a full small game (2x2 grid, 1 square)', () => {
         // 2x2 grid implies 1 square.
-        const game = new GameState(2);
+        const game = new GameState(2, 2);
 
         // Sq(0,0) needs H(0,0), H(1,0), V(0,0), V(0,1)
 
@@ -38,7 +38,7 @@ describe('DotDot (Dots and Boxes) Advanced Scenarios', () => {
     test('Handling large grid performance check', () => {
         // Create 20x20 grid
         const start = performance.now();
-        const game = new GameState(20);
+        const game = new GameState(20, 20);
         const end = performance.now();
         expect(end - start).toBeLessThan(100); // Should be instant
 
@@ -55,7 +55,7 @@ describe('DotDot (Dots and Boxes) Advanced Scenarios', () => {
         // We set up top row of vertical lines and outside horizontal lines, 
         // leaving the middle horizontal line to complete TWO squares at once.
 
-        const game = new GameState(3);
+        const game = new GameState(3, 3);
 
         // Pre-fill
         game.horizontalLines[0][0] = true; // Top-left
@@ -78,7 +78,7 @@ describe('DotDot (Dots and Boxes) Advanced Scenarios', () => {
         // sq(1,0): H(1,0), H(2,0), V(1,0), V(1,1)
 
         // Let's reset and be precise.
-        const preciseGame = new GameState(3);
+        const preciseGame = new GameState(3, 3);
 
         // Setup for Sq(0,0) EXCEPT bottom line H(1,0)
         preciseGame.horizontalLines[0][0] = true;
