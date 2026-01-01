@@ -34,8 +34,8 @@ class DotDotAI {
                 // Also, random selection among the best safe moves to feel natural.
                 return this.pickBestSafeMove(gameState, safeMoves);
             } else {
-                // Greedy: Just pick random safe move
-                return safeMoves[Math.floor(Math.random() * safeMoves.length)];
+                // Greedy: Pick safe move near the last move for better engagement
+                return this.pickMoveNearLast(gameState, safeMoves);
             }
         }
 
@@ -45,9 +45,9 @@ class DotDotAI {
             // Strategic: Try to open the SMALLEST chain possible to minimize damage.
             return this.pickLeastBadSacrifice(gameState);
         } else {
-            // Greedy: Random available move (inevitable doom)
+            // Greedy: Pick move near last move when forced to sacrifice
             const allMoves = this.getAllAvailableMoves(gameState);
-            return allMoves[Math.floor(Math.random() * allMoves.length)];
+            return this.pickMoveNearLast(gameState, allMoves);
         }
     }
 
@@ -150,42 +150,122 @@ class DotDotAI {
         return count;
     }
 
+    getAffectedSquares(gameState, move) {
+        // Returns array of squares that would be affected by this move
+        const { type, r, c } = move;
+        const affected = [];
+
+        if (type === 'h') {
+            // Horizontal line affects square above and below
+            if (r > 0 && r - 1 < gameState.rows - 1 && c < gameState.cols - 1) {
+                affected.push({ r: r - 1, c: c }); // Square above
+            }
+            if (r < gameState.rows - 1 && c < gameState.cols - 1) {
+                affected.push({ r: r, c: c }); // Square below
+            }
+        } else if (type === 'v') {
+            // Vertical line affects square left and right
+            if (c > 0 && r < gameState.rows - 1 && c - 1 < gameState.cols - 1) {
+                affected.push({ r: r, c: c - 1 }); // Square left
+            }
+            if (c < gameState.cols - 1 && r < gameState.rows - 1) {
+                affected.push({ r: r, c: c }); // Square right
+            }
+        }
+
+        return affected;
+    }
+
     pickBestSafeMove(gameState, safeMoves) {
-        // Heuristic: Prefer moves that leave square with 0 or 1 lines (very safe)
-        // over moves that leave square with 2 lines (safe for now, but dangerous).
-        // Wait, if I leave it with 2 lines, opponent adds 3rd (giveaway) -> I take.
-        // So leaving with 2 is actually BAD for opponent to touch, but fine for me to create?
-        // No, if I create a state of 2 lines, opponent adds 3rd, I take. 
-        // Opponent will avoid adding 3rd.
+        // Strategic heuristic: Among safe moves, prefer those that create fewer 2-line squares
+        // Creating a 2-line square sets up potential future danger
 
-        // Actually, simplest heuristic:
-        // Avoid placing lines on squares that already have 0 or 1 lines?
-        // No, we want to fill up the board.
+        const moveScores = safeMoves.map(move => {
+            let twoLineSquaresCreated = 0;
 
-        // Let's randomize for variety, but simple heuristic:
-        // Try not to place lines next to already-2-line squares (which would make them 3 and giveaway).
-        // But this is handled by `doesMoveGiveAwaySquare`.
+            // Check which squares this move affects
+            const affectedSquares = this.getAffectedSquares(gameState, move);
 
-        // Strategic addition: Double Cross / Chain management is hard without full graph.
-        // Simple Strategic: Pick random.
-        return safeMoves[Math.floor(Math.random() * safeMoves.length)];
+            for (const sq of affectedSquares) {
+                const currentLines = this.countLinesAroundSquare(gameState, sq.r, sq.c);
+                // If this square currently has 1 line, adding this move makes it 2 lines
+                if (currentLines === 1) {
+                    twoLineSquaresCreated++;
+                }
+            }
+
+            return { move, score: twoLineSquaresCreated };
+        });
+
+        // Sort by score (fewer 2-line squares is better)
+        moveScores.sort((a, b) => a.score - b.score);
+
+        // Among the best moves, prefer those near the last move
+        const bestScore = moveScores[0].score;
+        const bestMoves = moveScores.filter(m => m.score === bestScore);
+
+        return this.pickMoveNearLast(gameState, bestMoves.map(m => m.move));
     }
 
     pickLeastBadSacrifice(gameState) {
-        // We have to give something away.
-        // Find the move that opens the shortest chain?
-        // Determining chain length is costly (DFS).
-        // Approximation: Pick move that gives away only 1 square if possible?
-        // Or pick move near edge?
+        // We have to give something away - pick the move that creates the fewest 3-line squares
+        // This minimizes how many squares the opponent can immediately capture
 
         const moves = this.getAllAvailableMoves(gameState);
 
-        // Sort by "how many squares does it give away immediately?"
-        // We can simulate and check greedy opponent response?
-        // Too slow for JS on Main Thread maybe?
+        const moveScores = moves.map(move => {
+            let threeLineSquaresCreated = 0;
 
-        // fallback: random
-        return moves[Math.floor(Math.random() * moves.length)];
+            // Check which squares this move affects
+            const affectedSquares = this.getAffectedSquares(gameState, move);
+
+            for (const sq of affectedSquares) {
+                const currentLines = this.countLinesAroundSquare(gameState, sq.r, sq.c);
+                // If this square currently has 2 lines, adding this move makes it 3 lines (giveaway)
+                if (currentLines === 2) {
+                    threeLineSquaresCreated++;
+                }
+            }
+
+            return { move, score: threeLineSquaresCreated };
+        });
+
+        // Sort by score (fewer 3-line squares is better)
+        moveScores.sort((a, b) => a.score - b.score);
+
+        // Among the least bad moves, prefer those near the last move
+        const bestScore = moveScores[0].score;
+        const leastBadMoves = moveScores.filter(m => m.score === bestScore);
+
+        return this.pickMoveNearLast(gameState, leastBadMoves.map(m => m.move));
+    }
+
+    pickMoveNearLast(gameState, moves) {
+        // If no last move or only one option, pick random
+        if (!gameState.lastMove || moves.length === 1) {
+            return moves[Math.floor(Math.random() * moves.length)];
+        }
+
+        // Calculate distance from last move for each candidate
+        const movesWithDistance = moves.map(move => {
+            const dist = this.getMoveDistance(gameState.lastMove, move);
+            return { move, dist };
+        });
+
+        // Sort by distance (closer is better)
+        movesWithDistance.sort((a, b) => a.dist - b.dist);
+
+        // Pick randomly among the closest moves
+        const minDist = movesWithDistance[0].dist;
+        const closestMoves = movesWithDistance.filter(m => m.dist === minDist);
+
+        return closestMoves[Math.floor(Math.random() * closestMoves.length)].move;
+    }
+
+    getMoveDistance(move1, move2) {
+        // Calculate Manhattan distance between two moves
+        // Consider both the position and type of move
+        return Math.abs(move1.r - move2.r) + Math.abs(move1.c - move2.c);
     }
 }
 
