@@ -118,15 +118,21 @@ svg {
 .drawn-line {
     stroke-width: 4;
     stroke-linecap: round;
+    opacity: 0.8;
+    /* Slight fade as requested */
 }
 
+/* Subtle ink colors */
 .line-p1 {
-    stroke: var(--p1-color);
+    stroke: #543b3b;
 }
 
+/* Dark Reddish Ink */
 .line-p2 {
-    stroke: var(--p2-color);
+    stroke: #3b4554;
 }
+
+/* Dark Bluish Ink */
 
 .box-fill {
     fill-opacity: 0.3;
