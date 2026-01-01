@@ -93,6 +93,7 @@ class UI {
                 text.setAttribute("x", this.margin + c * this.dotSpacing + this.dotSpacing / 2);
                 text.setAttribute("y", this.margin + r * this.dotSpacing + this.dotSpacing / 2);
                 text.setAttribute("class", "box-text");
+                text.setAttribute("font-size", this.dotSpacing * 0.6); // Scale font with box size
                 text.setAttribute("id", `text-${r}-${c}`);
                 this.squaresGroup.appendChild(text);
             }
@@ -146,6 +147,9 @@ class UI {
     handleLineClick(type, r, c) {
         if (this.game.gameOver) return;
 
+        // Track who is making the move
+        const player = this.game.getCurrentPlayer();
+
         const result = this.game.placeLine(type, r, c);
 
         if (result.success) {
@@ -155,29 +159,12 @@ class UI {
             if (lineEl) {
                 lineEl.classList.remove('interaction-line');
                 lineEl.classList.add('drawn-line');
-                // The color depends on who placed it, but usually standard game shows black lines or neutral, 
-                // but let's color it by player who placed it for style.
-                // Wait, if I place a line, it's MY line? Standard rules say lines don't belong to players, marks do.
-                // But we can give it a hint color.
-                // Actually, let's just make it dark (ink).
-                // Or better, stick to the player color to show who made the move? 
-                // Let's use ink color for all drawn lines as per paperballs aesthetic usually.
-                // Re-reading CSS: .line-p1 { stroke: var(--p1-color); }
-                // Let's use player color for lines to make it clear who did what, it looks nice.
 
-                // Note: The player who placed it is the one who was current BEFORE the move.
-                // But the game state might have switched turn if NO square was made.
+                // Add player-specific class for line color
+                lineEl.classList.add(player === 'P1' ? 'line-p1' : 'line-p2');
 
-                // We need to know who made the move.
-                // If result.extraTurn is true, it's the current player (turn didn't change).
-                // If result.extraTurn is false, it was the OTHER player (turn switched).
-
-                // Let's rely on checking the previous turn owner, or easier: 
-                // GameState doesn't store who owns lines, just that they exist.
-                // But we can infer.
-
-                // Simplified: use a standard color for drawn lines (black/blue ink).
-                lineEl.style.stroke = "var(--ink-color)";
+                // Remove manual stroke setting if it was there
+                lineEl.style.stroke = "";
             }
 
             // Update any new squares

@@ -1,7 +1,8 @@
 :root {
     --bg-color: #f0f0f0;
     --paper-color: #fffdf0;
-    --line-color: #a4c2f4; /* Light blue notebook lines */
+    --line-color: #a4c2f4;
+    /* Light blue notebook lines */
     --ink-color: #2b2b2b;
     --p1-color: #e74c3c;
     --p2-color: #3498db;
@@ -23,7 +24,7 @@ body {
     background-color: var(--paper-color);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
     text-align: center;
@@ -53,8 +54,13 @@ h1 {
     border-radius: 4px;
 }
 
-#p1-score { color: var(--p1-color); }
-#p2-score { color: var(--p2-color); }
+#p1-score {
+    color: var(--p1-color);
+}
+
+#p2-score {
+    color: var(--p2-color);
+}
 
 .turn-indicator {
     background-color: #eee;
@@ -63,8 +69,15 @@ h1 {
     transition: all 0.3s ease;
 }
 
-.p1-turn { color: var(--p1-color); border: 2px solid var(--p1-color); }
-.p2-turn { color: var(--p2-color); border: 2px solid var(--p2-color); }
+.p1-turn {
+    color: var(--p1-color);
+    border: 2px solid var(--p1-color);
+}
+
+.p2-turn {
+    color: var(--p2-color);
+    border: 2px solid var(--p2-color);
+}
 
 .message {
     height: 1.5rem;
@@ -105,23 +118,38 @@ svg {
 .drawn-line {
     stroke-width: 4;
     stroke-linecap: round;
+    opacity: 0.8;
+    /* Slight fade as requested */
 }
 
-.line-p1 { stroke: var(--p1-color); }
-.line-p2 { stroke: var(--p2-color); }
+/* Pencil aesthetics */
+.line-p1 {
+    stroke: #666666;
+}
+
+/* Standard Pencil (HB) - Graphite Gray */
+.line-p2 {
+    stroke: #2a2a2a;
+}
+
+/* Dark Pencil (4B) - Deep Charcoal */
 
 .box-fill {
     fill-opacity: 0.3;
     transition: fill-opacity 0.5s;
 }
 
-.box-p1 { fill: var(--p1-color); }
-.box-p2 { fill: var(--p2-color); }
+.box-p1 {
+    fill: var(--p1-color);
+}
+
+.box-p2 {
+    fill: var(--p2-color);
+}
 
 .box-text {
     font-family: 'Courier New', Courier, monospace;
     font-weight: bold;
-    font-size: 1.5rem;
     fill: var(--ink-color);
     text-anchor: middle;
     dominant-baseline: middle;

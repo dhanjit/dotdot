@@ -21,12 +21,25 @@ This document describes how Antigravity AI assisted in developing the DotDot gam
 - Created SVG-based responsive rendering in `web/js/ui.js`.
 - Implemented responsive grid sizing for large grids (30x30).
 
-### 4. Testing
-- Created comprehensive Jest tests (`tests/game.test.js`, `tests/game-advanced.test.js`).
-- Verified all core game rules and edge cases.
+### Collaboration Workflow
+1. **Branching Strategy**:
+   - `master` is protected. Direct commits are **FORBIDDEN**.
+   - All changes must go through a feature branch: `claude/<feature-name>`.
+   - Feature branches must be merged via Pull Request (PR).
 
----
+2. **Branch Naming**:
+   - Format: `claude/<descriptive-name>`
+   - Example: `claude/fix-pencil-colors`
 
-**Version**: 1.1.0
+3. **Deployment**:
+   - Merging to `master` triggers deployment to `dhanjit.me`.
+
+4. **Testing**:
+   - All PRs must pass `npm test` before merging.
+
+## Tech Stack
+- **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+).
+- **Rendering**: SVG (Scalable Vector Graphics).
+- **Testing**: Jest.
 **Date**: January 2026
 **AI Model**: Google Deepmind Antigravity
