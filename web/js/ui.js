@@ -93,6 +93,7 @@ class UI {
                 text.setAttribute("x", this.margin + c * this.dotSpacing + this.dotSpacing / 2);
                 text.setAttribute("y", this.margin + r * this.dotSpacing + this.dotSpacing / 2);
                 text.setAttribute("class", "box-text");
+                text.setAttribute("font-size", this.dotSpacing * 0.6); // Scale font with box size
                 text.setAttribute("id", `text-${r}-${c}`);
                 this.squaresGroup.appendChild(text);
             }
