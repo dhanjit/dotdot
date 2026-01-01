@@ -188,3 +188,7 @@ class DotDotAI {
         return moves[Math.floor(Math.random() * moves.length)];
     }
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = DotDotAI;
+}
