@@ -37,6 +37,10 @@ This document describes how Antigravity AI assisted in developing the DotDot gam
 4. **Testing**:
    - All PRs must pass `npm test` before merging.
 
+5. **Commits**:
+   - Messages must be **fully descriptive**.
+   - Use imperative mood (e.g., "Add feature" not "Added feature").
+
 ## Tech Stack
 - **Frontend**: Vanilla HTML5, CSS3, JavaScript (ES6+).
 - **Rendering**: SVG (Scalable Vector Graphics).
