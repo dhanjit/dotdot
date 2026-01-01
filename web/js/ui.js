@@ -221,7 +221,9 @@ class UI {
             this.messageEl.textContent = "Game Over!";
         } else {
             const name = this.playerNames[currentPlayer];
-            this.turnIndicator.textContent = `${name}'s Turn`;
+            // Handle special case for "YOU" to avoid "YOU's Turn"
+            const turnText = name === 'YOU' ? 'Your Turn' : `${name}'s Turn`;
+            this.turnIndicator.textContent = turnText;
             this.turnIndicator.className = `turn-indicator ${currentPlayer === 'P1' ? 'p1-turn' : 'p2-turn'}`;
         }
     }
