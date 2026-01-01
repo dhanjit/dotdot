@@ -271,10 +271,35 @@ document.addEventListener('DOMContentLoaded', () => {
             if (moveCount >= maxChainMoves) {
                 console.warn('[AI] Hit maximum chain moves limit!');
 
-                // Force turn to end if AI still has it
+                // Make one final move to properly end the turn
                 if (game.getCurrentPlayer() === 'P2' && !game.gameOver) {
-                    console.warn('[AI] Forcing turn to switch to prevent stuck game');
-                    game.currentPlayerIndex = 0; // Switch to P1
+                    console.warn('[AI] Making final move to end turn gracefully');
+
+                    try {
+                        const finalMove = ai.getMove(game);
+                        if (finalMove) {
+                            const finalResult = game.placeLine(finalMove.type, finalMove.r, finalMove.c);
+                            console.log('[AI] Final move: %s(%d,%d), squares=%d',
+                                finalMove.type, finalMove.r, finalMove.c, finalResult.newSquares?.length || 0);
+
+                            // Update UI
+                            ui.renderMove(finalMove.type, finalMove.r, finalMove.c, finalResult);
+                            ui.updateStatus();
+
+                            // Force turn to end even if final move captured squares
+                            if (game.getCurrentPlayer() === 'P2') {
+                                console.warn('[AI] Final move gave extra turn, forcefully ending turn');
+                                game.currentPlayerIndex = 0; // Switch to P1
+                            }
+                        } else {
+                            // No move available, force turn switch
+                            console.warn('[AI] No final move available, forcing turn switch');
+                            game.currentPlayerIndex = 0;
+                        }
+                    } catch (err) {
+                        console.error('[AI] Error making final move:', err);
+                        game.currentPlayerIndex = 0; // Switch to P1 on error
+                    }
                 }
             }
 
