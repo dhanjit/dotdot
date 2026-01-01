@@ -24,6 +24,7 @@ class GameState {
         this.occupiedSquares = 0;
         this.gameOver = false;
         this.winner = null;
+        this.lastMove = null; // Track the last move made
     }
 
     getCurrentPlayer() {
@@ -54,6 +55,9 @@ class GameState {
         } else {
             return { success: false, message: 'Invalid line type' };
         }
+
+        // Track the last move
+        this.lastMove = { type, r, c };
 
         // Check if any square was completed by this move
         const completedSquares = this.checkForCompletedSquares(type, r, c);
