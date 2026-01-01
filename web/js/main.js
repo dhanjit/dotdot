@@ -155,60 +155,136 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function checkAiTurn() {
-        if (gameMode !== 'pvc' || game.gameOver) return;
+        // Early exit conditions
+        if (gameMode !== 'pvc') {
+            console.log('[AI] Not PvC mode: gameMode=%s', gameMode);
+            return;
+        }
 
-        // P2 is AI
-        if (game.getCurrentPlayer() === 'P2' && !isAiThinking) {
-            isAiThinking = true;
+        if (game.gameOver) {
+            console.log('[AI] Game is over');
+            return;
+        }
+
+        const currentPlayer = game.getCurrentPlayer();
+        if (currentPlayer !== 'P2') {
+            console.log('[AI] Not AI turn: currentPlayer=%s', currentPlayer);
+            return;
+        }
+
+        // Check if already processing
+        if (isAiThinking) {
+            console.log('[AI] Already thinking, skipping duplicate call');
+            return;
+        }
+
+        // Start AI turn sequence
+        console.log('[AI] ========== Starting AI turn sequence ==========');
+        isAiThinking = true;
+
+        try {
             aiStatus.classList.remove('hidden');
-
-            // Disable interaction
             ui.container.style.pointerEvents = 'none';
 
-            // Keep making moves while AI has the turn (for chain captures)
             let moveCount = 0;
-            const maxChainMoves = 20; // Safety limit to prevent infinite loops
+            const maxChainMoves = 200; // Safety limit (increased for large grids and long endgame chains)
 
             while (game.getCurrentPlayer() === 'P2' && !game.gameOver && moveCount < maxChainMoves) {
-                // Simulate thinking delay (shorter for chain moves)
+                console.log('[AI] --- Move #%d ---', moveCount + 1);
+                console.log('[AI] Current player: %s, Game over: %s', game.getCurrentPlayer(), game.gameOver);
+
+                // Thinking delay
                 const delay = moveCount === 0 ? 800 : 400;
                 await new Promise(resolve => setTimeout(resolve, delay));
 
-                // Make move
-                try {
-                    const move = ai.getMove(game);
-                    if (move) {
-                        const result = game.placeLine(move.type, move.r, move.c);
-
-                        if (result.success) {
-                            // Manually update UI (bypass the automatic checkAiTurn call)
-                            ui.renderMove(move.type, move.r, move.c, result);
-                            ui.updateStatus();
-
-                            moveCount++;
-
-                            // If no extra turn, break the loop
-                            if (!result.extraTurn) {
-                                break;
-                            }
-                        } else {
-                            console.error("AI move failed:", move);
-                            break;
-                        }
-                    } else {
-                        console.error("AI returned no move! Game might be stuck.");
-                        break;
-                    }
-                } catch (e) {
-                    console.error("AI Error:", e);
+                // Verify still AI's turn after delay
+                if (game.getCurrentPlayer() !== 'P2') {
+                    console.log('[AI] No longer AI turn after delay, breaking');
                     break;
+                }
+
+                if (game.gameOver) {
+                    console.log('[AI] Game ended during delay, breaking');
+                    break;
+                }
+
+                // Get AI move
+                let move;
+                try {
+                    move = ai.getMove(game);
+                    console.log('[AI] getMove returned: %o', move);
+                } catch (err) {
+                    console.error('[AI] Exception in getMove:', err);
+                    break;
+                }
+
+                if (!move) {
+                    console.error('[AI] getMove returned null/undefined!');
+                    console.error('[AI] Game state: player=%s, gameOver=%s, scores=%o',
+                        game.getCurrentPlayer(), game.gameOver, game.scores);
+
+                    // Check if there are actually moves available
+                    const scoringMoves = ai.findScoringMoves(game);
+                    const safeMoves = ai.findSafeMoves(game);
+                    console.error('[AI] Available moves: %d scoring, %d safe',
+                        scoringMoves.length, safeMoves.length);
+
+                    break;
+                }
+
+                // Place the move
+                let result;
+                try {
+                    result = game.placeLine(move.type, move.r, move.c);
+                    console.log('[AI] placeLine result: success=%s, extraTurn=%s, squares=%d, newPlayer=%s',
+                        result.success, result.extraTurn, result.newSquares?.length || 0, game.getCurrentPlayer());
+                } catch (err) {
+                    console.error('[AI] Exception in placeLine:', err);
+                    break;
+                }
+
+                if (!result.success) {
+                    console.error('[AI] Move failed! Move: %s(%d,%d)', move.type, move.r, move.c);
+                    break;
+                }
+
+                // Update UI
+                try {
+                    ui.renderMove(move.type, move.r, move.c, result);
+                    // updateStatus will call checkAiTurn, but isAiThinking flag prevents recursion
+                    ui.updateStatus();
+                } catch (err) {
+                    console.error('[AI] Exception in UI update:', err);
+                }
+
+                moveCount++;
+
+                // Check if chain continues
+                if (!result.extraTurn) {
+                    console.log('[AI] No extra turn, chain ended');
+                    break;
+                } else {
+                    console.log('[AI] Extra turn granted, continuing chain...');
                 }
             }
 
-            // Cleanup
+            if (moveCount >= maxChainMoves) {
+                console.warn('[AI] Hit maximum chain moves limit!');
+            }
+
+            console.log('[AI] ========== AI sequence complete ==========');
+            console.log('[AI] Total moves: %d, Final player: %s, Game over: %s',
+                moveCount, game.getCurrentPlayer(), game.gameOver);
+
+        } catch (err) {
+            console.error('[AI] Fatal error in checkAiTurn:', err);
+        } finally {
+            // Always cleanup, even if there was an error
+            console.log('[AI] Cleaning up: re-enabling UI');
             ui.container.style.pointerEvents = 'auto';
             aiStatus.classList.add('hidden');
             isAiThinking = false;
+            console.log('[AI] Cleanup complete, isAiThinking=%s', isAiThinking);
         }
     }
 
