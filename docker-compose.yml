@@ -1,0 +1,24 @@
+services:
+  # Builder Service: Compiles C++ to WebAssembly
+  builder:
+    image: emscripten/emsdk:latest
+    container_name: dotdot-builder
+    volumes:
+      - .:/src
+    working_dir: /src
+    # Runs the existing build script inside the container
+    command: ./build_wasm.sh
+    # Use current user ID to ensure generated files are editable by the user
+    user: "${UID}:${GID}"
+
+  # Web Service: Serves the game
+  server:
+    image: nginx:alpine
+    container_name: dotdot-server
+    volumes:
+      - ./web:/usr/share/nginx/html
+    ports:
+      - "8080:80"
+    depends_on:
+      builder:
+        condition: service_completed_successfully

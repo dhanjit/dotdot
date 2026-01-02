@@ -1,0 +1,12 @@
+# Build Artifacts
+web/js/dotdot_core.js
+web/js/dotdot_core.wasm
+build/
+cmake-build-debug/
+
+# Docker / Environment
+.env
+.DS_Store
+
+# Temporary / Rulesets
+*_ruleset.json
