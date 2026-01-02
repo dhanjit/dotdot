@@ -1,20 +1,50 @@
-# DotDot
+# DotDot Game
 
-A classic two-player strategy game (Dots and Boxes) where players take turns connecting dots to form squares.
+A modern implementation of "Dots and Boxes" featuring a C++ Core Engine compiled to WebAssembly.
 
-## Game Rules
-- **Grid**: Starts with an NxN matrix of dots.
-- **Turn**: Connect two adjacent dots with a horizontal or vertical line.
-- **Scoring**: If a line completes a square, the player captures it (marked with initials) and gets another turn.
-- **Winning**: The game ends when all squares are captured. The player with the most squares wins.
+## Architecture
+- **Core Engine**: C++23 (Domain Driven Design) located in `core/`.
+- **Frontend**: Vanilla JS + HTML5 + CSS3 located in `web/`.
+- **Integration**: Emscripten (WebAssembly) via `core/src/bindings/`.
 
-## Development
-This project follows the structure of `paperballs`.
-- `web/`: Contains the game source code.
-- `tests/`: Contains automated tests.
+## Running the Game (Docker)
+The easiest way to run the game is using Docker Compose. This handles both Building (C++ → Wasm) and Serving.
 
-## Running Locally
-Just open `web/index.html` in your browser.
+### Prerequisites (Docker)
+- Docker Desktop or Docker Engine.
 
-## Testing
-Run `npm install` then `npm test`.
+### Start
+```bash
+docker-compose up
+```
+1.  **Build**: The `builder` container will compile the C++ code to `web/js/dotdot_core.wasm`.
+2.  **Serve**: The `server` container will start Nginx.
+3.  **Play**: Open **[http://localhost:8080](http://localhost:8080)**.
+
+To rebuild the C++ code after making changes, simply run `docker-compose up --build` or just `docker-compose up` again (since the builder runs on startup).
+
+---
+
+## Local Development (Manual)
+If you prefer not to use Docker:
+
+### Prerequisites (Manual)
+- **Emscripten SDK**: `brew install emscripten`
+- **Python 3**: For serving.
+
+### Build & Run
+1.  **Build Wasm**:
+    ```bash
+    ./build_wasm.sh
+    ```
+2.  **Serve**:
+    ```bash
+    python3 -m http.server
+    ```
+3.  **Play**: Open `http://localhost:8000/web/`.
+
+## Testing (C++ Core)
+The project includes GoogleTest unit tests for the core engine.
+```bash
+./build_and_test.sh
+```

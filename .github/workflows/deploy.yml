@@ -1,13 +1,39 @@
-name: Deploy to dhanjit.me
+name: Build and Release
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  trigger-deploy:
+  build:
+    name: Build Wasm and Release
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Vercel Deployment
-        run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_620Ufctmg7UeCvx73e0sNh12wFY2/cjyn9B1xrM"
+      - uses: actions/checkout@v3
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+
+      - name: Verify Emscripten
+        run: emcc -v
+
+      - name: Build WebAssembly
+        run: |
+          chmod +x build_wasm.sh
+          ./build_wasm.sh
+
+      - name: Create Artifact Zip
+        run: zip -r dotdot-web.zip web
+
+      - name: Update 'latest' Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          files: dotdot-web.zip
+          prerelease: false
+          name: Latest Build
+          body: "Rolling release of the latest build from master."
